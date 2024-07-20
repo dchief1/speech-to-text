@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "rootDirs": ["src"],
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,   
+    "strict": true,      
+    "skipLibCheck": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@app/services/*": ["services/*"],
+      "@app/utils/*": ["utils/*"],
+    },
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node"]
+  },
+  "exclude": ["src/**/*.spec.ts", "node_modules"],
+  "include": ["typings/**/*.d.ts", "src/**/*", "drizzle/*/"]
+}
