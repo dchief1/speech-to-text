@@ -3,9 +3,9 @@ import configs from "../config/config";
 
 const jwtSecretKey = configs.JWT_SECRET_KEY;
 
-const generateToken = (user: any & { _id: string }): string => {
+const generateToken = (user: any & { id: string }): string => {
   const payload = {
-    userId: user._id,
+    userId: user.id,
     email: user.email,
   };
 
