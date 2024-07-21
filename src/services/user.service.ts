@@ -4,20 +4,27 @@ import bcrypt from "bcrypt";
 import { InferInsertModel } from "drizzle-orm";
 import { generateToken } from "../utils/generateToken";
 import { eq, or } from "drizzle-orm/expressions";
+import ConflictError from "../errors/conflict";
+import BadRequestError from "../errors/bad-request";
+import { createSession } from "../middleware/session";
 
-type NewUser = InferInsertModel<typeof user>;
+export type UserDataType = {
+  username: string;
+  password: string;
+  email: string;
+};
 
-export async function createUser(newUser: NewUser) {
-  const hashedPassword = await bcrypt.hash(newUser.password, 10);
-  const userWithHashedPassword = { ...newUser, password: hashedPassword };
+export const createUser = async (payload: UserDataType) => {
+  const hashedPassword = await bcrypt.hash(payload.password, 10);
+  const userWithHashedPassword = { ...payload, password: hashedPassword };
 
-  // Check if the user already exists
   const existingUsers = await connectDb
     .select()
     .from(user)
-    .where(or(eq(user.email, newUser.email), eq(user.username, newUser.username)));
+    .where(or(eq(user.email, payload.email), eq(user.username, payload.username)));
+
   if (existingUsers.length > 0) {
-    throw new Error("User already exists");
+    throw new ConflictError("User already exists");
   }
 
   await connectDb.insert(user).values(userWithHashedPassword).returning();
@@ -25,25 +32,40 @@ export async function createUser(newUser: NewUser) {
   const [createdUser] = await connectDb
     .select()
     .from(user)
-    .where(eq(user.email, newUser.email));
+    .where(eq(user.email, payload.email));
 
-  return { ...newUser, id: createdUser.id };
-}
+  return {
+    status: true,
+    message: `User Created`,
+    data: createdUser,
+  };
+};
 
-export async function loginUser(email: string, password: string) {
+export const loginUser = async (email: string, password: string) => {
   const foundUsers = await connectDb.select().from(user).where(eq(user.email, email));
   if (foundUsers.length === 0) {
-    throw new Error("User not found");
+    throw new BadRequestError("Incorrect login details");
   }
 
   const foundUser = foundUsers[0];
 
   const isPasswordValid = await bcrypt.compare(password, foundUser.password);
   if (!isPasswordValid) {
-    throw new Error("Invalid password");
+    throw new BadRequestError("Incorrect login details");
   }
+
+  const sessionPayload = {
+    id: foundUser.id,
+    email: foundUser.email,
+  };
+
+  console.log(sessionPayload);
+
+  const testSession = await createSession(foundUser.id, sessionPayload);
+  console.log(testSession);
 
   // Generate a token or any other login logic
   const newToken = generateToken(foundUser);
+
   return { message: "Login successful", token: newToken };
-}
+};

@@ -1,7 +1,7 @@
 const END_POINTS = {
   REGISTER: "/register",
   LOGIN: "/login",
-  VOICE_TEXT: "/transcribe",
+  V_TEXT: "/text",
 };
 
 const PREFIXES = {

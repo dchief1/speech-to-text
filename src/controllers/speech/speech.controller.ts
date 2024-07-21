@@ -1,27 +1,20 @@
-import { Request, Response } from "express";
-import { convertSpeechToText } from "../../services/speech.service";
+import { transcribeText } from "../../services/speech.service";
 import { StatusCodes } from "http-status-codes";
+import { Controller } from "../../utils/constant";
+import { uploadToS3 } from "../../utils/upload";
 
-export async function uploadAudio(req: Request, res: Response) {
+export const SpeechText: Controller = async (req, res, next) => {
   try {
-    // Ensure that a file and userId are provided
-    if (!req.file || !req.body.userId) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Missing file or userId",
-      });
+    if (!req.files || !req.files.audio) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "No image uploaded" });
     }
 
-    // Extract userId and file from the request
-    const userId = Number(req.body.userId);
-    const file = req.file.buffer;
-    const filename = req.file.originalname;
+    const audio = req.files.audio;
+    const userId = req.user.id;
 
-    // Convert speech to text
-    const text = await convertSpeechToText(userId, file, filename);
-
-    // Respond with the transcribed text
-    res.status(StatusCodes.OK).json({ text });
-  } catch (error: any) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    const audioUrl = await uploadToS3(audio);
+    res.status(StatusCodes.CREATED).json(await transcribeText(userId, audioUrl));
+  } catch (error) {
+    next(error);
   }
-}
+};

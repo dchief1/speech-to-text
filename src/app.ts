@@ -8,6 +8,8 @@ import notFound from "./middleware/not-found";
 import errorHandlerMiddleware from "./middleware/error-handler";
 import morgan from "morgan";
 import userRoute from "./routes/user.route";
+import fileUpload from "express-fileupload";
+import speechRoute from "./routes/speech.route";
 
 // Establish connection to DB
 connectDatabase();
@@ -24,17 +26,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 
 app.use(cookieParser());
-
-// erro middleware
-// app.use(notFound);
-app.use(errorHandlerMiddleware);
+app.use(fileUpload());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello !!");
 });
 
 app.use(PREFIXES.API + PREFIXES.USER, userRoute);
+app.use(PREFIXES.API, speechRoute);
 
-// app.use(PREFIXES.API + PREFIXES.ADMIN, adminRoute);
+// erro middleware
+// app.use(notFound);
+app.use(errorHandlerMiddleware);
 
 export default app;

@@ -1,13 +1,10 @@
 import { Router } from "express";
-import multer from "multer";
 import { END_POINTS } from "../config/endPoints";
-import { uploadAudio } from "../controllers/speech/speech.controller";
+import { SpeechText } from "../controllers/speech/speech.controller";
+import { verifyToken } from "../middleware/authMiddleWare";
 
 const speechRoute = Router();
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-speechRoute.post(END_POINTS.VOICE_TEXT, upload.single("file"), uploadAudio);
+speechRoute.post(END_POINTS.V_TEXT, verifyToken, SpeechText);
 
 export default speechRoute;

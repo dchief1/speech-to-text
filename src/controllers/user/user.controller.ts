@@ -1,35 +1,20 @@
-import { Request, Response } from "express";
 import { createUser, loginUser } from "../../services/user.service";
 import { StatusCodes } from "http-status-codes";
-import { createUserSchema } from "./user.validation";
-import IUser from "./user.interface";
+import { Controller } from "../../utils/constant";
 
-export async function register(req: Request, res: Response) {
+export const register: Controller = async (req, res, next) => {
   try {
-    const { error } = createUserSchema.validate(req.body);
-
-    if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Invalid request body",
-        error: error.details[0].message,
-      });
-    }
-
-    const newUser = req.body as IUser;
-    const createdUser = await createUser(newUser);
-    res.status(StatusCodes.CREATED).json(createdUser);
-  } catch (error: any) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
+    res.status(StatusCodes.CREATED).json(await createUser(req.body));
+  } catch (error) {
+    next(error);
   }
-}
+};
 
-export async function login(req: Request, res: Response) {
+export const login: Controller = async (req, res, next) => {
   try {
-    const { email, password } = req.body as Pick<IUser, "email" | "password">;
-
-    const loginResult = await loginUser(email, password);
-    res.status(StatusCodes.OK).json(loginResult);
+    const { email, password } = req.body;
+    res.status(StatusCodes.OK).json(await loginUser(email, password));
   } catch (error: any) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message });
+    next(error);
   }
-}
+};

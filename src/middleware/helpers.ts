@@ -12,4 +12,12 @@ const chechJwt = async (hash: string, secret: string = configs.JWT_SECRET_KEY ??
   }
 };
 
-export { chechJwt };
+export { chechJwt as chechJwt };
+
+export function parseJSON(value: any): any {
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    return value;
+  }
+}
