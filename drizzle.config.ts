@@ -1,15 +1,24 @@
 import dotenv from "dotenv";
+import { defineConfig } from "drizzle-kit";
 
 dotenv.config();
 
-module.exports = {
-  migrationsFolder: "./migrations",
-  driver: "pg",
-  connection: {
-    user: process.env.PG_USER as string,
-    host: process.env.PG_HOST as string,
-    database: process.env.PG_DATABASE as string,
-    password: process.env.PG_PASSWORD as string,
-    port: process.env.PG_PORT as string,
+function getEnvVar(name: string, defaultValue?: string): string {
+  const value = process.env[name];
+  if (!value && !defaultValue) {
+    throw new Error(`Environment variable ${name} is not defined`);
+  }
+  return value || defaultValue!;
+}
+
+export default defineConfig({
+  schema: "./src/db/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
+  dbCredentials: {
+    host: getEnvVar("PG_HOST"),
+    user: getEnvVar("PG_USER"),
+    password: getEnvVar("PG_PASSWORD"),
+    database: getEnvVar("PG_DATABASE"),
   },
-};
+});

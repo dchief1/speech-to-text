@@ -8,12 +8,14 @@
     "start": "node dist/src/server.js",
     "build": "tsc",
     "dev": "nodemon --watch './**/*.ts' --exec ts-node ./src/server.ts",
-    "migrate": "ts-node drizzle/migrate.ts"
+    "generate-migrations": "npx drizzle-kit generate",
+    "migrate": "npm run generate-migrations && ts-node src/db/migrate.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "morgan": "^1.10.0",
@@ -22,6 +24,7 @@
     "typescript": "^5.5.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/http-status-codes": "^1.2.0",

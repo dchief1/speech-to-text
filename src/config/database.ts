@@ -1,8 +1,9 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import pg from "pg";
 import configs from "../config/config";
+import * as schema from "../db/schema";
 
-const pool = new Pool({
+export const client = new pg.Client({
   host: configs.PG_HOST,
   port: parseInt(configs.PG_PORT || "5432"),
   database: configs.PG_DATABASE,
@@ -12,13 +13,11 @@ const pool = new Pool({
 
 export const connectDatabase = async () => {
   try {
-    const client = await pool.connect();
-    await client.query("SELECT 1 + 1 AS result");
+    await client.connect();
     console.log("Connected to DB 😊");
-    client.release();
   } catch (err) {
     console.error("Database connection error:", err);
   }
 };
 
-export const connectDb = drizzle(pool);
+export const connectDb = drizzle(client, { schema });

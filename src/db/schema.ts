@@ -1,10 +1,18 @@
-const { model, types } = require("drizzle-orm");
+import { pgTable, serial, varchar, text, timestamp } from "drizzle-orm/pg-core";
 
-const User = model("users", {
-  id: types.int().primary().notNull(),
-  name: types.string().notNull(),
-  email: types.string().notNull().unique(),
-  password: types.string().notNull(),
+export const user = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").unique().notNull(),
+  password: text("password").notNull(),
+  email: text("email").unique().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-module.exports = User;
+export const speechToText = pgTable("speech", {
+  id: serial("id").primaryKey(),
+  userId: serial("user_id")
+    .references(() => user.id)
+    .notNull(),
+  text: text("text").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
