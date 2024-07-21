@@ -15,6 +15,7 @@ export const configs = {
   PG_PASSWORD: process.env.PG_PASSWORD as string,
 
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY as string,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY as string,
 };
 
 export default configs;
