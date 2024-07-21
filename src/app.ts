@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import notFound from "./middleware/not-found";
 import errorHandlerMiddleware from "./middleware/error-handler";
 import morgan from "morgan";
+import userRoute from "./routes/user.route";
 
 // Establish connection to DB
 connectDatabase();
@@ -25,16 +26,14 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 // erro middleware
-app.use(notFound);
+// app.use(notFound);
 app.use(errorHandlerMiddleware);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello !!");
 });
 
-// app.use(PREFIXES.API, xstreamRoute);
-
-// app.use(PREFIXES.API + PREFIXES.USER, UserRoute);
+app.use(PREFIXES.API + PREFIXES.USER, userRoute);
 
 // app.use(PREFIXES.API + PREFIXES.ADMIN, adminRoute);
 

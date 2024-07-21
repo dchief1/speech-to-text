@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import configs from "../config/config";
-import IUser from "../interfaces/user.interface";
 
 const jwtSecretKey = configs.JWT_SECRET_KEY;
 

@@ -1,8 +1,0 @@
-const { error } = createUserSchema.validate(req.body);
-
-if (error) {
-  return res.status(StatusCodes.BAD_REQUEST).json({
-    message: "Invalid request body",
-    error: error.details[0].message,
-  });
-}
