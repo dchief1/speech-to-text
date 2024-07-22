@@ -1,65 +1,70 @@
-import axios from "axios";
+import { SpeechClient, protos } from "@google-cloud/speech";
 import { connectDb } from "../config/database";
 import { speechToText } from "../db/schema";
-import FormData from "form-data";
-import configs from "../config/config";
-import fs from "fs";
+import { S3 } from "aws-sdk";
+import { PassThrough } from "stream";
 
-const MAX_RETRIES = 5;
-const RETRY_DELAY = 1000;
+const speechClient = new SpeechClient();
+const s3 = new S3();
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const transcribeAudioFromUrl = async (audioPath: string): Promise<string> => {
-  let attempt = 0;
-
-  while (attempt < MAX_RETRIES) {
-    try {
-      const form = new FormData();
-      form.append("file", fs.createReadStream(audioPath));
-      form.append("model", "whisper-1");
-
-      const response = await axios.post(
-        "https://api.openai.com/v1/audio/transcriptions",
-        form,
-        {
-          headers: {
-            ...form.getHeaders(),
-            Authorization: `Bearer ${configs.OPENAI_API_KEY}`,
-          },
-        }
-      );
-
-      return response.data.text;
-    } catch (error: any) {
-      if (error.response && error.response.status === 429) {
-        // Handle rate limiting
-        attempt++;
-        const delay = RETRY_DELAY * Math.pow(2, attempt);
-        console.warn(`Rate limited. Retrying in ${delay}ms...`);
-        await sleep(delay);
-      } else {
-        console.error("Error transcribing audio:", error);
-        throw error;
-      }
-    }
+export const extractBucketAndKeyFromUrl = (url: string): [string, string] => {
+  console.log(`Parsing URL: ${url}`);
+  const match = url.match(/^https:\/\/([^.]+)\.s3\.amazonaws\.com\/(.+)$/);
+  if (!match) {
+    throw new Error("Invalid S3 URL");
   }
-
-  throw new Error("Max retries reached. Unable to transcribe audio.");
+  const bucket = match[1];
+  const key = decodeURIComponent(match[2]);
+  return [bucket, key];
 };
 
-export const transcribeText = async (userId: number, fileName: any) => {
-  const result = await transcribeAudioFromUrl(fileName);
+const transcribeAudioFromS3 = async (bucket: string, key: string): Promise<string> => {
+  const passThroughStream = new PassThrough();
+  const s3Stream = s3.getObject({ Bucket: bucket, Key: key }).createReadStream();
+  s3Stream.pipe(passThroughStream);
+
+  const audioBytes = await new Promise<string>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    passThroughStream.on("data", (chunk) => chunks.push(chunk));
+    passThroughStream.on("end", () => resolve(Buffer.concat(chunks).toString("base64")));
+    passThroughStream.on("error", (err) => reject(err));
+  });
+
+  const request: protos.google.cloud.speech.v1.IRecognizeRequest = {
+    audio: {
+      content: audioBytes,
+    },
+    config: {
+      encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.LINEAR16,
+      sampleRateHertz: 16000,
+      languageCode: "en-US",
+    },
+  };
+
+  const [response] = await speechClient.recognize(request);
+  const transcription = response.results
+    ?.map((result) => result.alternatives?.[0].transcript)
+    .join("\n");
+
+  if (!transcription) {
+    throw new Error("Failed to transcribe audio");
+  }
+
+  return transcription;
+};
+
+export const transcribeText = async (userId: number, bucket: string, key: string) => {
+  const result = await transcribeAudioFromS3(bucket, key);
 
   const newSpeech = await connectDb.insert(speechToText).values({
     userId,
     text: result,
-    fileName,
+    fileName: key,
   });
 
   return {
     status: true,
-    message: `Speech created`,
+    message: "Speech created",
     data: newSpeech,
   };
 };

@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
+import pg, { Pool } from "pg";
 import configs from "../config/config";
 import * as schema from "../db/schema";
 
@@ -11,7 +11,7 @@ import * as schema from "../db/schema";
 //   password: configs.PG_PASSWORD,
 // });
 
-export const client = new pg.Client({
+export const client = new Pool({
   connectionString: configs.PG_URL,
   ssl: {
     rejectUnauthorized: false,

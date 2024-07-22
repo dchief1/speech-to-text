@@ -2,9 +2,12 @@ import { Router } from "express";
 import { END_POINTS } from "../config/endPoints";
 import { SpeechText } from "../controllers/speech/speech.controller";
 import { verifyToken } from "../middleware/authMiddleWare";
-import upload from "../utils/multerUpload";
+import multer from "multer";
 
 const speechRoute = Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 /**
  * @swagger
@@ -41,6 +44,6 @@ const speechRoute = Router();
  *       500:
  *         description: Server error
  */
-speechRoute.post(END_POINTS.V_TEXT, verifyToken, upload.single("audio"), SpeechText);
+speechRoute.post(END_POINTS.V_TEXT, verifyToken, SpeechText);
 
 export default speechRoute;
