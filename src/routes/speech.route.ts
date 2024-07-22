@@ -2,6 +2,7 @@ import { Router } from "express";
 import { END_POINTS } from "../config/endPoints";
 import { SpeechText } from "../controllers/speech/speech.controller";
 import { verifyToken } from "../middleware/authMiddleWare";
+import upload from "../utils/multerUpload";
 
 const speechRoute = Router();
 
@@ -40,6 +41,6 @@ const speechRoute = Router();
  *       500:
  *         description: Server error
  */
-speechRoute.post(END_POINTS.V_TEXT, verifyToken, SpeechText);
+speechRoute.post(END_POINTS.V_TEXT, verifyToken, upload.single("audio"), SpeechText);
 
 export default speechRoute;

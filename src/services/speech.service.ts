@@ -1,29 +1,22 @@
 import axios from "axios";
 import { connectDb } from "../config/database";
 import { speechToText } from "../db/schema";
-import { InferInsertModel } from "drizzle-orm";
 import FormData from "form-data";
 import configs from "../config/config";
-import OpenAI from "openai";
 import fs from "fs";
-import path from "path";
-
-const openai = new OpenAI({
-  apiKey: configs.OPENAI_API_KEY,
-});
 
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 1000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const transcribeAudioFromUrl = async (audioUrl: any): Promise<string> => {
+const transcribeAudioFromUrl = async (audioPath: string): Promise<string> => {
   let attempt = 0;
 
   while (attempt < MAX_RETRIES) {
     try {
       const form = new FormData();
-      form.append("file", fs.createReadStream(audioUrl));
+      form.append("file", fs.createReadStream(audioPath));
       form.append("model", "whisper-1");
 
       const response = await axios.post(
@@ -38,12 +31,6 @@ const transcribeAudioFromUrl = async (audioUrl: any): Promise<string> => {
       );
 
       return response.data.text;
-      // const resp = await openai.audio.transcriptions.create({
-      //   file: audioUrl,
-      //   model: "whisper-1",
-      // });
-      // console.log(resp.text);
-      // return resp.text;
     } catch (error: any) {
       if (error.response && error.response.status === 429) {
         // Handle rate limiting
