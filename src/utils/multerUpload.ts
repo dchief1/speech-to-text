@@ -3,11 +3,14 @@ import path from "path";
 import fs from "fs";
 import { validateFileType } from "./constant";
 import BadRequestError from "../errors/bad-request";
+import express from "express";
 
 // Ensure the Audio directory exists
 const uploadPath = path.join(__dirname, "../Audio");
+console.log(uploadPath, "path");
+
 if (!fs.existsSync(uploadPath)) {
-  throw new Error(`Upload directory does not exist: ${uploadPath}`);
+  fs.mkdirSync(uploadPath, { recursive: true });
 }
 
 const storage = multer.diskStorage({
