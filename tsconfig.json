@@ -5,7 +5,7 @@
     "target": "es2022",
     "lib": ["es2022"],
     "module": "CommonJS",
-    "rootDirs": ["src"],
+    "rootDir": "./src",
     "declaration": true,
     "outDir": "./dist",
     "esModuleInterop": true,
