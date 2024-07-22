@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "vitest",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "build": "tsc",
     "dev": "nodemon --watch './**/*.ts' --exec ts-node ./src/server.ts",
     "generate-migrations": "npx drizzle-kit generate",
