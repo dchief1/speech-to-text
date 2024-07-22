@@ -3,12 +3,19 @@ import pg from "pg";
 import configs from "../config/config";
 import * as schema from "../db/schema";
 
+// export const client = new pg.Client({
+//   host: configs.PG_HOST,
+//   port: parseInt(configs.PG_PORT || "5432"),
+//   database: configs.PG_DATABASE,
+//   user: configs.PG_USER,
+//   password: configs.PG_PASSWORD,
+// });
+
 export const client = new pg.Client({
-  host: configs.PG_HOST,
-  port: parseInt(configs.PG_PORT || "5432"),
-  database: configs.PG_DATABASE,
-  user: configs.PG_USER,
-  password: configs.PG_PASSWORD,
+  connectionString: configs.PG_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 export const connectDatabase = async () => {

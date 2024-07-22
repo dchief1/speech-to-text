@@ -7,7 +7,7 @@ export const configs = {
   PORT: process.env.PORT || 9000,
   ENVIRONMENT: process.env.ENVIRONMENT,
 
-  DB_TEST_URL: process.env.DB_TEST_URL as string,
+  PG_URL: process.env.PG_URL as string,
   PG_HOST: process.env.PG_HOST as string,
   PG_PORT: process.env.PG_PORT as string,
   PG_DATABASE: process.env.PG_DATABASE as string,
