@@ -18,9 +18,13 @@ export const configs = {
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY as string,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY as string,
 
-  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
-  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+  // CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+  // CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+  // CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
+  BUCKET_REGION: process.env.BUCKET_REGION as string,
 };
 
 export default configs;

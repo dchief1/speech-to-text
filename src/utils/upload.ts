@@ -1,24 +1,19 @@
-import * as dotenv from "dotenv";
-dotenv.config();
 import { v4 as uuidv4 } from "uuid";
 import AWS from "aws-sdk";
 import BadRequestError from "../errors/bad-request";
 import { validateFileType } from "./constant";
+import configs from "../config/config";
 
 AWS.config.update({
-  accessKeyId: (process.env.AWS_ACCESS_KEY_ID as string) || "AKIARZAMQBCQY5KUAKWN",
-  secretAccessKey:
-    (process.env.AWS_SECRET_ACCESS_KEY as string) || "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",
-  region: (process.env.BUCKET_REGION as string) || "us-west-1",
+  accessKeyId: configs.AWS_ACCESS_KEY_ID,
+  secretAccessKey: configs.AWS_SECRET_ACCESS_KEY,
+  region: configs.BUCKET_REGION,
 });
 
-//Create an S3 instance
+//S3 instance
 const s3 = new AWS.S3();
 
-//Function to upload files to S3
-
 export const uploadToS3 = async (file: any) => {
-  // Check if a file is provided
   if (!file) {
     throw new BadRequestError("No file provided for upload.");
   }
@@ -41,7 +36,6 @@ export const uploadToS3 = async (file: any) => {
     // Return the S3 URL
     return `https://${params.Bucket}.s3.amazonaws.com/${key}`;
   } catch (error) {
-    // Handle errors appropriately (e.g., logging, throwing, etc.)
     console.error("Error uploading file to S3:", error);
     throw error;
   }
