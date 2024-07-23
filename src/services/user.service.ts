@@ -34,10 +34,12 @@ export const createUser = async (payload: UserDataType) => {
     .from(user)
     .where(eq(user.email, payload.email));
 
+  const { password, ...userWithoutPassword } = createdUser;
+
   return {
     status: true,
-    message: `User Created`,
-    data: createdUser,
+    message: "User Created",
+    data: userWithoutPassword,
   };
 };
 
