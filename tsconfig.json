@@ -5,19 +5,19 @@
     "target": "es2022",
     "lib": ["es2022"],
     "module": "CommonJS",
-    "rootDir": "./src",
+    "rootDir": "src",
     "declaration": true,
-    "outDir": "./dist/src",
+    "outDir": "dist/src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "moduleResolution": "node",  
     "typeRoots": ["./node_modules/@types", "./types"]
   },
   "include": [
     "src/**/*.ts",
-    "types/**/*"
+    "types/**/*",
   ],
   "exclude": ["node_modules", "dist"],
   "files": [
