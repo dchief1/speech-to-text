@@ -2,12 +2,8 @@ import { Router } from "express";
 import { END_POINTS } from "../config/endPoints";
 import { SpeechText } from "../controllers/speech/speech.controller";
 import { verifyToken } from "../middleware/authMiddleWare";
-import multer from "multer";
 
 const speechRoute = Router();
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 /**
  * @swagger
